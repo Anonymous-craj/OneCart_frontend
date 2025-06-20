@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import Logo from "../assets/logo.png";
 import Google from "../assets/google.png";
 import { useNavigate } from "react-router-dom";
@@ -6,14 +6,19 @@ import { IoEyeOutline } from "react-icons/io5";
 import { IoEye } from "react-icons/io5";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../../utils/Firebase";
+import { userDataContext } from "../context/UserContext";
+
 function Registration() {
   let navigate = useNavigate();
 
-  const [show, setShow] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { serverUrl } = useContext(authDataContext);
+  let [show, setShow] = useState(false);
+  let [name, setName] = useState("");
+  let [email, setEmail] = useState("");
+  let [password, setPassword] = useState("");
+  let { serverUrl } = useContext(authDataContext);
+  let { getCurrentUser } = useContext(userDataContext);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -24,6 +29,30 @@ function Registration() {
           name,
           email,
           password,
+        },
+        { withCredentials: true }
+      );
+      getCurrentUser();
+      navigate("/");
+      console.log(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const googleSignup = async () => {
+    try {
+      const response = await signInWithPopup(auth, provider);
+      let user = response.user;
+      let name = user.displayName;
+      let email = user.email;
+      console.log(response);
+
+      const result = await axios.post(
+        serverUrl + "/api/auth/googlelogin",
+        {
+          name,
+          email,
         },
         { withCredentials: true }
       );
@@ -52,7 +81,10 @@ function Registration() {
           action=""
           className="w-[90%] h-[90%] flex flex-col items-center justify-start"
         >
-          <div className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer">
+          <div
+            className="w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer"
+            onClick={googleSignup}
+          >
             <img src={Google} alt="" className="w-[20px] rounded-full" />
             Registration with Google
           </div>
