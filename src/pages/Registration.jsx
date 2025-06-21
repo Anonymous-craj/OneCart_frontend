@@ -56,6 +56,8 @@ function Registration() {
         },
         { withCredentials: true }
       );
+      getCurrentUser();
+      navigate("/");
       console.log(result.data);
     } catch (error) {
       console.log(error);

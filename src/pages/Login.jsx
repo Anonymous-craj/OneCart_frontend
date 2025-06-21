@@ -22,7 +22,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const result = await axios.post(
         serverUrl + "/api/auth/login",
         {
           email,
@@ -30,7 +30,9 @@ function Login() {
         },
         { withCredentials: true }
       );
-      console.log(response.data);
+      console.log(result.data);
+      getCurrentUser();
+      navigate("/");
     } catch (error) {
       console.log(error);
     }
@@ -52,9 +54,9 @@ function Login() {
         },
         { withCredentials: true }
       );
-      console.log(result.data);
       getCurrentUser();
       navigate("/");
+      console.log(result.data);
     } catch (error) {
       console.log(error);
     }
